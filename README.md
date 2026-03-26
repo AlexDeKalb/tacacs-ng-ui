@@ -18,6 +18,8 @@ Video Demo: [English - Demo tacacs-ng-iu - Setup for Juniper Devices](https://yo
 
 Video Tiếng Việt:[tacacs-ng-ui - Demo - Cấu hình chứng thực tập trung với thiết bị Juniper](https://youtu.be/vnuZMcHxpH4)
 
+Telegram Group: <https://t.me/+v1eAXg-BhotlODY1>
+
 You can signup an account and use this tacacs server to test with your simulator lab.
 
 - **Dashboard:** <https://dashboard.tacacs.9ping.cloud>
