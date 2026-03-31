@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from backend.app.crud import users
+from app.crud import users
 from app.models import Item, ItemCreate
 from tests.utils.user import create_random_user
 from tests.utils.utils import random_lower_string
