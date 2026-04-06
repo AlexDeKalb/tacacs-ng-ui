@@ -1,10 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Security Contact
-    about: Please report security vulnerabilities to security@tiangolo.com
-  - name: Question or Problem
-    about: Ask a question or ask about a problem in GitHub Discussions.
-    url: https://github.com/fastapi/full-stack-fastapi-template/discussions/categories/questions
-  - name: Feature Request
-    about: To suggest an idea or ask about a feature, please start with a question saying what you would like to achieve. There might be a way to do it already.
-    url: https://github.com/fastapi/full-stack-fastapi-template/discussions/categories/questions
+  - name: Security Vulnerability
+    about: Report a security vulnerability responsibly. Do not create a public issue.
+    url: https://github.com/tacacs-ng-ui/tacacs-ng-ui/security/advisories/new
+  - name: Questions & Discussions
+    about: Ask questions, share ideas, or discuss general topics about TACACS-NG-UI.
+    url: https://github.com/tacacs-ng-ui/tacacs-ng-ui/discussions
+  - name: Community Support
+    about: Join our Telegram group or Reddit community for peer support.
+    url: https://t.me/+v1eAXg-BhotlODY1
