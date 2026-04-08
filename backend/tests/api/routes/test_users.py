@@ -8,6 +8,7 @@ from app.crud import users
 from app.core.config import settings
 from app.core.security import verify_password
 from app.models import User, UserCreate
+from tests.utils.user import user_authentication_headers
 from tests.utils.utils import (
     random_email,
     random_lower_string,
@@ -195,56 +196,42 @@ def test_update_user_me(
     assert user_db.full_name == full_name
 
 
-def test_update_password_me(
-    client: TestClient, superuser_token_headers: dict[str, str], db: Session
-) -> None:
-    # Generate a temp PCI DSS compliant password to test with
-    temp_password = random_pci_compliant_password()
+def test_update_password_me(client: TestClient, db: Session) -> None:
+    email = random_email()
+    password = random_pci_compliant_password()
+    user_in = UserCreate(email=email, password=password)
+    user = users.create_user(session=db, user_create=user_in)
+    headers = user_authentication_headers(client=client, email=email, password=password)
+
+    new_password = random_pci_compliant_password()
     data = {
-        "current_password": settings.FIRST_SUPERUSER_PASSWORD,
-        "new_password": temp_password,
+        "current_password": password,
+        "new_password": new_password,
     }
     r = client.patch(
         f"{settings.API_V1_STR}/users/me/password",
-        headers=superuser_token_headers,
+        headers=headers,
         json=data,
     )
     assert r.status_code == 200
-    updated_user = r.json()
-    assert updated_user["message"] == "Password updated successfully"
+    assert r.json()["message"] == "Password updated successfully"
 
-    user_query = select(User).where(User.email == settings.FIRST_SUPERUSER)
-    user_db = db.exec(user_query).first()
-    assert user_db
-    assert user_db.email == settings.FIRST_SUPERUSER
-    assert verify_password(temp_password, user_db.hashed_password)
-
-    # Reset to a new compliant password for next test to use
-    # (since the fixture superuser_token_headers uses the original password)
-    # We create a new password and update the test credentials
-    another_password = random_pci_compliant_password()
-    reset_data = {
-        "current_password": temp_password,
-        "new_password": another_password,
-    }
-    r = client.patch(
-        f"{settings.API_V1_STR}/users/me/password",
-        headers=superuser_token_headers,
-        json=reset_data,
-    )
-    db.refresh(user_db)
-    assert r.status_code == 200
-    assert verify_password(another_password, user_db.hashed_password)
+    db.refresh(user)
+    assert verify_password(new_password, user.hashed_password)
 
 
-def test_update_password_me_incorrect_password(
-    client: TestClient, superuser_token_headers: dict[str, str]
-) -> None:
+def test_update_password_me_incorrect_password(client: TestClient, db: Session) -> None:
+    email = random_email()
+    password = random_pci_compliant_password()
+    user_in = UserCreate(email=email, password=password)
+    users.create_user(session=db, user_create=user_in)
+    headers = user_authentication_headers(client=client, email=email, password=password)
+
     new_password = random_pci_compliant_password()
-    data = {"current_password": new_password, "new_password": new_password}
+    data = {"current_password": "WrongPassword123!", "new_password": new_password}
     r = client.patch(
         f"{settings.API_V1_STR}/users/me/password",
-        headers=superuser_token_headers,
+        headers=headers,
         json=data,
     )
     assert r.status_code == 400
@@ -271,15 +258,21 @@ def test_update_user_me_email_exists(
 
 
 def test_update_password_me_same_password_error(
-    client: TestClient, superuser_token_headers: dict[str, str]
+    client: TestClient, db: Session
 ) -> None:
+    email = random_email()
+    password = random_pci_compliant_password()
+    user_in = UserCreate(email=email, password=password)
+    users.create_user(session=db, user_create=user_in)
+    headers = user_authentication_headers(client=client, email=email, password=password)
+
     data = {
-        "current_password": settings.FIRST_SUPERUSER_PASSWORD,
-        "new_password": settings.FIRST_SUPERUSER_PASSWORD,
+        "current_password": password,
+        "new_password": password,
     }
     r = client.patch(
         f"{settings.API_V1_STR}/users/me/password",
-        headers=superuser_token_headers,
+        headers=headers,
         json=data,
     )
     assert r.status_code == 400
