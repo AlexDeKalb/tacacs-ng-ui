@@ -9,6 +9,8 @@ def test_init_successful_connection() -> None:
     engine_mock = MagicMock()
 
     session_mock = MagicMock()
+    session_mock.__enter__ = MagicMock(return_value=session_mock)
+    session_mock.__exit__ = MagicMock(return_value=False)
     exec_mock = MagicMock(return_value=True)
     session_mock.configure_mock(**{"exec.return_value": exec_mock})
 
