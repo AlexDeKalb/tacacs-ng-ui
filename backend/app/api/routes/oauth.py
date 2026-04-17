@@ -1,6 +1,8 @@
 import hashlib
 import hmac
 import time
+from datetime import timedelta
+from urllib.parse import urlencode
 
 import httpx
 from fastapi import APIRouter, HTTPException
@@ -58,7 +60,7 @@ def google_authorize() -> dict[str, str]:
         "state": state,
         "access_type": "online",
     }
-    url = GOOGLE_AUTH_URL + "?" + "&".join(f"{k}={v}" for k, v in params.items())
+    url = GOOGLE_AUTH_URL + "?" + urlencode(params)
     return {"url": url}
 
 
@@ -114,6 +116,9 @@ def google_callback(
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
 
-    jwt = create_access_token(subject=str(user.id))
+    jwt = create_access_token(
+        subject=str(user.id),
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
     redirect_url = f"{settings.FRONTEND_HOST}/oauth-callback?token={jwt}"
     return RedirectResponse(url=redirect_url)
