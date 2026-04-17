@@ -107,11 +107,11 @@ def update_host(
 )
 def delete_host(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a host.
     """
     host = session.get(Host, id)
     if not host:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Host not found")
 
     session.delete(host)
     session.commit()

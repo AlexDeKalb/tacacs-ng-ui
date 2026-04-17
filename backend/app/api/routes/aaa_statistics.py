@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -70,7 +70,7 @@ def read_aaa_statistics_range(
             )
     else:
         # Default to today if no range is provided
-        end_date = datetime.utcnow() - timedelta(days=1)
+        end_date = datetime.now(timezone.utc) - timedelta(days=1)
         start_date = end_date - timedelta(days=7)
 
     return_statistics = {}

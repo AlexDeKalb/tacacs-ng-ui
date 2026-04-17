@@ -57,7 +57,7 @@ def create_tacacs_group(*, session: SessionDep, group_in: TacacsGroupCreate) -> 
     if group:
         raise HTTPException(
             status_code=400,
-            detail="The user with this group name already exists in the system.",
+            detail="The group with this group name already exists in the system.",
         )
 
     user = tacacs_groups.create_tacacs_group(session=session, user_create=group_in)
@@ -72,7 +72,7 @@ def read_tacacs_group_by_id(
     session: SessionDep,
 ) -> Any:
     """
-    Get a specific user by id.
+    Get a specific group by id.
     """
     group = session.get(TacacsGroup, id)
 
@@ -100,7 +100,7 @@ def update_tacacs_group(
     if not db_tacacs_group:
         raise HTTPException(
             status_code=404,
-            detail="The user with this id does not exist in the system",
+            detail="The group with this id does not exist in the system",
         )
 
     db_tacacs_group = tacacs_groups.update_tacacs_group(
@@ -115,12 +115,12 @@ def update_tacacs_group(
 )
 def delete_tacacs_group(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a group.
     """
 
     tacacs_group = session.get(TacacsGroup, id)
     if not tacacs_group:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Group not found")
     session.delete(tacacs_group)
     session.commit()
     return Message(message="Group deleted successfully")

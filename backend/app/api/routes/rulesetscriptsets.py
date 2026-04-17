@@ -145,12 +145,12 @@ def update_rulesetscriptset(
 )
 def delete_rulesetscriptset(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a ruleset script set.
     """
 
     rulesetscriptset = session.get(RulesetScriptSet, id)
     if not rulesetscriptset:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="RulesetScriptSet not found")
 
     session.delete(rulesetscriptset)
     session.commit()

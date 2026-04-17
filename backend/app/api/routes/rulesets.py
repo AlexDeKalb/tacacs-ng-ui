@@ -137,12 +137,12 @@ def update_ruleset(
 )
 def delete_ruleset(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a ruleset.
     """
 
     ruleset = session.get(Ruleset, id)
     if not ruleset:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Ruleset not found")
     session.delete(ruleset)
     session.commit()
     return Message(message="Ruleset deleted successfully")

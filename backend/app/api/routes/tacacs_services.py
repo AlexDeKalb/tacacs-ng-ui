@@ -124,12 +124,12 @@ def update_tacacs_service(
 )
 def delete_tacacs_service(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a TACACS service.
     """
 
     tacacs_service = session.get(TacacsService, id)
     if not tacacs_service:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="TacacsService not found")
     session.delete(tacacs_service)
     session.commit()
     return Message(message="TacacsService deleted successfully")

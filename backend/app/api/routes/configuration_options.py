@@ -122,12 +122,12 @@ def update_configuration_option(
 )
 def delete_configuration_option(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a configuration option.
     """
 
     configuration_option = session.get(ConfigurationOption, id)
     if not configuration_option:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="ConfigurationOption not found")
 
     session.delete(configuration_option)
     session.commit()

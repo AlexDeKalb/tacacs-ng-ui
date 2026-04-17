@@ -123,7 +123,7 @@ def update_profilescript(
 )
 def delete_profilescript(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a profile script.
     """
 
     profilescript = session.get(ProfileScript, id)

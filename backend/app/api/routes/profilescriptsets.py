@@ -133,12 +133,12 @@ def update_profilescriptset(
 )
 def delete_profilescriptset(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a profile script set.
     """
 
     profilescriptset = session.get(ProfileScriptSet, id)
     if not profilescriptset:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="ProfileScriptSet not found")
 
     session.delete(profilescriptset)
     session.commit()

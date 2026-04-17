@@ -13,7 +13,6 @@ from app.models import (
     TacacsNgSetting,
     Mavis,
     Host,
-    TacacsGroup,
     TacacsUser,
     TacacsConfigPublic,
 )

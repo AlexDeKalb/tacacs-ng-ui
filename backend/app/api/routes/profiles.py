@@ -138,12 +138,12 @@ def update_profile(
 )
 def delete_profile(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a profile.
     """
 
     profile = session.get(Profile, id)
     if not profile:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Profile not found")
 
     session.delete(profile)
     session.commit()

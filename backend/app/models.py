@@ -1,17 +1,20 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
-from typing import List, Optional
 from app.core.config import settings
 
 
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
 class TimestampModel(SQLModel):
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    created_at: datetime = Field(default_factory=_utc_now, nullable=False)
     updated_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        sa_column_kwargs={"onupdate": datetime.utcnow},
+        default_factory=_utc_now,
+        sa_column_kwargs={"onupdate": _utc_now},
     )
 
 
@@ -221,15 +224,15 @@ class MavisPreviewPublic(SQLModel):
 
 class HostBase(SQLModel):
     name: str = Field(index=True, unique=True, max_length=255)
-    ipv4_address: Optional[str] = None
-    ipv6_address: Optional[str] = None
+    ipv4_address: str | None = None
+    ipv6_address: str | None = None
     secret_key: str = Field(max_length=255)
-    welcome_banner: Optional[str] = None
-    reject_banner: Optional[str] = None
-    motd_banner: Optional[str] = None
-    failed_authentication_banner: Optional[str] = None
-    parent: Optional[str] = None
-    description: Optional[str] = None
+    welcome_banner: str | None = None
+    reject_banner: str | None = None
+    motd_banner: str | None = None
+    failed_authentication_banner: str | None = None
+    parent: str | None = None
+    description: str | None = None
 
 
 class HostCreate(HostBase):
@@ -259,7 +262,7 @@ class HostsPublic(SQLModel):
 
 class TacacsGroupBase(SQLModel):
     group_name: str = Field(index=True, unique=True, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class TacacsGroupCreate(TacacsGroupBase):
@@ -292,8 +295,8 @@ class TacacsUserBase(SQLModel):
     username: str = Field(index=True, unique=True, max_length=255)
     password_type: str = Field(index=True, max_length=255)
     member: str = Field(index=True, max_length=255)
-    description: Optional[str] = None
-    password: Optional[str] = None
+    description: str | None = None
+    password: str | None = None
 
 
 class TacacsUserCreate(TacacsUserBase):
@@ -325,7 +328,7 @@ class TacacsUsersPublic(SQLModel):
 # -- TacacsService Table ---
 class TacacsServiceBase(SQLModel):
     name: str = Field(index=True, unique=True, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class TacacsServiceCreate(TacacsServiceBase):
@@ -358,7 +361,7 @@ class TacacsServicesPublic(SQLModel):
 class ProfileBase(SQLModel):
     name: str = Field(index=True, unique=True, max_length=255)
     action: str = Field(index=True, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class ProfileCreate(ProfileBase):
@@ -372,7 +375,7 @@ class ProfileUpdate(ProfileBase):
 # Database model, database table inferred from class name
 class Profile(ProfileBase, TimestampModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    profile_scripts: List["ProfileScript"] = Relationship(
+    profile_scripts: list["ProfileScript"] = Relationship(
         back_populates="profile", cascade_delete=True
     )
 
@@ -401,7 +404,7 @@ class ProfileScriptBase(SQLModel):
     key: str = Field(index=True, max_length=255)
     value: str = Field(index=True, max_length=255)
     action: str = Field(index=True, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
     profile_id: uuid.UUID | None = None
 
 
@@ -421,7 +424,7 @@ class ProfileScript(ProfileScriptBase, TimestampModel, table=True):
     )
     profile: Profile | None = Relationship(back_populates="profile_scripts")
 
-    profile_script_sets: List["ProfileScriptSet"] = Relationship(
+    profile_script_sets: list["ProfileScriptSet"] = Relationship(
         back_populates="profile_script",
         cascade_delete=True,
     )
@@ -445,7 +448,7 @@ class ProfileScriptsPublic(SQLModel):
 class ProfileScriptSetBase(SQLModel):
     key: str = Field(index=True, max_length=255)
     value: str
-    description: Optional[str] = None
+    description: str | None = None
     profilescript_id: uuid.UUID
 
 
@@ -492,7 +495,7 @@ class RulesetBase(SQLModel):
     name: str = Field(index=True, unique=True, max_length=255)
     enabled: str = Field(default="yes")
     action: str = Field(index=True, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class RulesetCreate(RulesetBase):
@@ -506,7 +509,7 @@ class RulesetUpdate(RulesetBase):
 # Database model, database table inferred from class name
 class Ruleset(RulesetBase, TimestampModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    ruleset_scripts: List["RulesetScript"] = Relationship(
+    ruleset_scripts: list["RulesetScript"] = Relationship(
         back_populates="ruleset", cascade_delete=True
     )
 
@@ -535,7 +538,7 @@ class RulesetScriptBase(SQLModel):
     key: str = Field(index=True, max_length=255)
     value: str = Field(index=True, max_length=255)
     action: str = Field(index=True, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
     ruleset_id: uuid.UUID = Field(nullable=False)
 
 
@@ -555,7 +558,7 @@ class RulesetScript(RulesetScriptBase, TimestampModel, table=True):
     )
     ruleset: Ruleset | None = Relationship(back_populates="ruleset_scripts")
 
-    ruleset_script_sets: List["RulesetScriptSet"] = Relationship(
+    ruleset_script_sets: list["RulesetScriptSet"] = Relationship(
         back_populates="ruleset_script", cascade_delete=True
     )
 
@@ -577,7 +580,7 @@ class RulesetScriptsPublic(SQLModel):
 class RulesetScriptSetBase(SQLModel):
     key: str = Field(index=True, max_length=255)
     value: str = Field(index=True, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
     rulesetscript_id: uuid.UUID
 
 
@@ -623,7 +626,7 @@ class RulesetScriptSetsPublic(SQLModel):
 # -- Tacacs Config File Table ---
 class TacacsConfigBase(SQLModel):
     filename: str = Field(index=True, unique=True, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class TacacsConfigCreate(TacacsConfigBase):
@@ -664,7 +667,7 @@ class TacacsConfigsPublic(SQLModel):
 class TacacsLogBase(SQLModel):
     filename: str = Field(index=True, max_length=255)
     filepath: str = Field(index=True, max_length=1024)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=_utc_now)
 
 
 class TacacsLogCreate(TacacsLogBase):
@@ -679,7 +682,7 @@ class TacacsLogUpdate(TacacsLogBase):
 class TacacsLog(TacacsLogBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     updated_at: datetime = Field(
-        default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow}
+        default_factory=_utc_now, sa_column_kwargs={"onupdate": _utc_now}
     )
 
 
@@ -699,7 +702,7 @@ class TacacsLogsPublic(SQLModel):
 class ConfigurationOptionBase(SQLModel):
     name: str = Field(index=True, unique=True, max_length=255)
     config_option: str
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class ConfigurationOptionCreate(ConfigurationOptionBase):
@@ -736,7 +739,7 @@ class AuthenticationStatisticsBase(SQLModel):
     user_source_ip: str = Field(index=True, max_length=1024)
     success_count: int = Field(default=0)
     fail_count: int = Field(default=0)
-    log_date: datetime = Field(default_factory=datetime.utcnow)
+    log_date: datetime = Field(default_factory=_utc_now)
 
 
 class AuthenticationStatisticsCreate(AuthenticationStatisticsBase):
@@ -773,7 +776,7 @@ class AuthorizationStatisticsBase(SQLModel):
     user_source_ip: str = Field(index=True, max_length=1024)
     permit_count: int = Field(default=0)
     deny_count: int = Field(default=0)
-    log_date: datetime = Field(default_factory=datetime.utcnow)
+    log_date: datetime = Field(default_factory=_utc_now)
 
 
 class AuthorizationStatisticsCreate(AuthorizationStatisticsBase):
@@ -808,7 +811,7 @@ class AccountingStatisticsBase(SQLModel):
     user_source_ip: str = Field(index=True, max_length=1024)
     start_count: int = Field(default=0)
     stop_count: int = Field(default=0)
-    log_date: datetime = Field(default_factory=datetime.utcnow)
+    log_date: datetime = Field(default_factory=_utc_now)
 
 
 class AccountingStatisticsCreate(AccountingStatisticsBase):

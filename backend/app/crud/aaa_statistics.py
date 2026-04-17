@@ -1,6 +1,6 @@
 import re
 import os
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from collections import Counter, defaultdict
 from typing import Any
 
@@ -119,7 +119,7 @@ def get_last_7_days_statistics(
     """
     Retrieves statistics for the last 7 days from the database.
     """
-    end_date = datetime.utcnow().date() - timedelta(days=1)
+    end_date = datetime.now(timezone.utc).date() - timedelta(days=1)
     start_date = end_date - timedelta(days=6)
     return _get_range_statistics(session, start_date, end_date, "last_7_days")
 
@@ -144,7 +144,7 @@ def process_authentication_statistics(
     end_date: datetime,
     skip: int = 0,
     limit: int = 5,
-) -> None:
+) -> dict[str, Any]:
     """
     Processes authentication log files to extract statistics and save them to the database.
     """
@@ -257,7 +257,7 @@ def process_authorization_statistics(
     end_date: datetime,
     skip: int = 0,
     limit: int = 5,
-) -> None:
+) -> dict[str, Any]:
     """
     Processes authorization log files to extract statistics and save them to the database.
     """
@@ -394,14 +394,14 @@ def process_today_authentication_statistics(
     summary_date = today.date()
 
     # --- Print Statistics ---
-    print(f"\n--- Authentication Summary for {summary_date} ---")
-    print(f"Total Authentication Events: {total_events}")
-    print(f"Unique NAS IPs: {unique_nas_ip_count}")
-    print(f"  - Successful: {successful_auths}")
-    print(f"  - Failed:     {failed_auths}")
-    print(f"Unique User Source IPs: {unique_user_source_ip_count}")
-    print(f"Unique User/NAS/Client combinations: {len(all_keys)}")
-    print("--------------------------------------------------")
+    logger.info(f"\n--- Authentication Summary for {summary_date} ---")
+    logger.info(f"Total Authentication Events: {total_events}")
+    logger.info(f"Unique NAS IPs: {unique_nas_ip_count}")
+    logger.info(f"  - Successful: {successful_auths}")
+    logger.info(f"  - Failed:     {failed_auths}")
+    logger.info(f"Unique User Source IPs: {unique_user_source_ip_count}")
+    logger.info(f"Unique User/NAS/Client combinations: {len(all_keys)}")
+    logger.info("--------------------------------------------------")
 
     # --- Aggregate statistics ---
     failed_count_by_user = defaultdict(int)

@@ -125,12 +125,12 @@ def update_tacacs_user(
 )
 def delete_tacacs_user(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a TACACS user.
     """
 
     tacacs_user = session.get(TacacsUser, id)
     if not tacacs_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="TACACS user not found")
     session.delete(tacacs_user)
     session.commit()
-    return Message(message="Item deleted successfully")
+    return Message(message="TACACS user deleted successfully")

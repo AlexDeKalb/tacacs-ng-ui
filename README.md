@@ -320,6 +320,6 @@ Check the file [release-notes.md](./release-notes.md).
 
 ## License
 
-This project use <https://github.com/fastapi/full-stack-fastapi-template> as a template.
+This project is licensed under the terms of the MIT license.
 
-The Full Stack FastAPI Template is licensed under the terms of the MIT license.
+Source code: <https://github.com/thangphan205/tacacs-ng-ui>

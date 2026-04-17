@@ -1,6 +1,6 @@
 import uuid
 from typing import Any
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
@@ -65,8 +65,8 @@ def generate_preview_tacacs_config(*, session: SessionDep) -> Any:
     tacacs_config = tacacs_configs.generate_preview_tacacs_config(session=session)
     return {
         "data": tacacs_config,
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
     }
 
 
@@ -218,12 +218,12 @@ def update_tacacs_config(
 )
 def delete_tacacs_config(session: SessionDep, id: uuid.UUID) -> Message:
     """
-    Delete an item.
+    Delete a TACACS config.
     """
 
     db_tacacs_config = session.get(TacacsConfig, id)
     if not db_tacacs_config:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="TacacsConfig not found")
     tacacs_configs.delete_tacacs_config(
         session=session, db_tacacs_config=db_tacacs_config
     )
