@@ -1,7 +1,14 @@
 from typing import Any
 
+from passlib.context import CryptContext
 from sqlmodel import Session, select
 from app.models import TacacsUser, TacacsUserCreate, TacacsUserUpdate
+
+tacacs_pwd_context = CryptContext(schemes=["sha512_crypt"], deprecated="auto")
+
+
+def hash_tacacs_password(password: str) -> str:
+    return tacacs_pwd_context.hash(password)
 
 
 def get_tacacs_user_by_username(
@@ -16,6 +23,8 @@ def create_tacacs_user(
     *, session: Session, user_create: TacacsUserCreate
 ) -> TacacsUser:
     db_obj = TacacsUser.model_validate(user_create)
+    if db_obj.password_type == "crypt" and db_obj.password:
+        db_obj.password = hash_tacacs_password(db_obj.password)
     session.add(db_obj)
     session.commit()
     session.refresh(db_obj)
@@ -26,6 +35,8 @@ def update_tacacs_user(
     *, session: Session, db_user: TacacsUser, user_in: TacacsUserUpdate
 ) -> Any:
     user_data = user_in.model_dump(exclude_unset=True)
+    if user_data.get("password_type") == "crypt" and user_data.get("password"):
+        user_data["password"] = hash_tacacs_password(user_data["password"])
     db_user.sqlmodel_update(user_data)
     session.add(db_user)
     session.commit()
