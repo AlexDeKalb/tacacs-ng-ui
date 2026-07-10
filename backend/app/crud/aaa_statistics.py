@@ -143,7 +143,7 @@ def parse_local_today_authentication_details() -> list[dict]:
 
     all_keys = set(successful_logins.keys()) | set(failed_logins.keys())
     list_authentication_details = []
-    for username, nas_ip, user_source_ip in sorted(all_keys):
+    for username, nas_ip, user_source_ip in sorted(all_keys, key=lambda x: (x[0] or "", x[1] or "", x[2] or "")):
         key = (username, nas_ip, user_source_ip)
         list_authentication_details.append(
             {
