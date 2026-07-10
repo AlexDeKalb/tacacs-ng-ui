@@ -1,0 +1,37 @@
+api:
+  dashboard: false
+
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+  https:
+    address: ":443"
+
+certificatesResolvers:
+  le:
+    acme:
+      email: "c-alexander.dekalb@spectrum.com"
+      storage: /letsencrypt/acme.json
+      dnsChallenge:
+        provider: route53
+        delayBeforeCheck: 30
+        resolvers:
+          - "1.1.1.1:53"
+          - "8.8.8.8:53"
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: traefik-public
+    endpoint: "unix:///var/run/docker.sock"
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+log:
+  level: INFO

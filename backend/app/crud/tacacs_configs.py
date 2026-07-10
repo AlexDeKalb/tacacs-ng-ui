@@ -104,7 +104,7 @@ def generate_tacacs_ng_config(*, session: Session) -> Any:
     tacacs_ng_basic = session.exec(statement).first()
     tacacs_ng_info = tacacs_ng_basic.model_dump()
 
-    mavises_template = generate_tacacs_mavis_setting(session=session)
+    mavises_template = ""
 
     config_file_template = """#!/usr/local/sbin/tac_plus-ng
 id = spawnd {{
@@ -129,11 +129,7 @@ id = tac_plus-ng {{
     authorization log = authorizationlog
     accounting log = accountinglog
     
-    {mavises_template}
-
-    login backend = mavis
-    user backend = mavis
-    pap backend = mavis""".format(
+        pap password mapping = login""".format(
         addr=tacacs_ng_info["ipv4_address"],
         port=tacacs_ng_info["ipv4_port"],
         inst_min=tacacs_ng_info["instances_min"],
@@ -143,7 +139,6 @@ id = tac_plus-ng {{
         authenticationlog=tacacs_ng_info["authentication_logfile_destination"],
         authorizationlog=tacacs_ng_info["authorization_logfile_destination"],
         accountinglog=tacacs_ng_info["accounting_logfile_destination"],
-        mavises_template=mavises_template,
     )
 
     # Begin host
